@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "better-marathon-rtmp"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.75.0"
+uvicorn = {extras = ["standard"], version = "^0.17.5"}
+python-multipart = "^0.0.5"
+requests = "^2.27.1"
+types-requests = "^2.27.11"
+sqlalchemy2-stubs = "^0.0.2-alpha.20"
+SQLAlchemy = {extras = ["mypy"], version = "^1.4.32"}
+
+[tool.poetry.dev-dependencies]
+mypy = "^0.940"
+black = {version = "^22.1.0", allow-prereleases = true}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+python_version = "3.10"
+
+files = ["./app"]
+plugins = ["sqlalchemy.ext.mypy.plugin"]
