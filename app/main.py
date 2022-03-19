@@ -9,6 +9,8 @@ from sqlalchemy import select, delete
 from . import schemas, models
 from .db import engine, get_db
 
+domain = "rtmp"
+
 schemas.Base.metadata.create_all(engine)
 
 app = FastAPI()
@@ -33,10 +35,10 @@ def read_root():
 
 
 @app.get("/drop/{name}")
-async def drop_stream(name: str):
+async def drop_stream(name: str, db: Session = Depends(get_db)):
     # TODO get stream from DB to resolve region
     params = {"app": "live", "name": name}
-    response = requests.get("http://rtmp/control/drop/publisher", params=params)
+    response = requests.get(f"http://{domain}/control/drop/publisher", params=params)
     print(response.status_code)
     return
 

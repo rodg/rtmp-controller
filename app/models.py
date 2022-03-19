@@ -14,6 +14,7 @@ class NewStream(StreamBase):
 
 class ShowLiveStream(BaseModel):
     client_id: Optional[int] = None
+    region: Optional[str] = None
 
     class Config:
         orm_mode = True

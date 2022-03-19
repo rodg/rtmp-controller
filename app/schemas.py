@@ -31,5 +31,6 @@ class LiveStream(Base):
     id = Column(Integer, primary_key=True, index=True)
     stream_id = Column(Integer, ForeignKey("streams.id"))
     client_id = Column(Integer)
+    region = Column(String)
 
     stream: "Stream" = relationship("Stream", back_populates="live_stream")
