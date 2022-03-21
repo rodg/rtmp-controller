@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 
 class StreamBase(BaseModel):
@@ -7,9 +7,13 @@ class StreamBase(BaseModel):
     stream_key: str
     allow_live: bool
 
+    class Config:
+        orm_mode = True
 
-class NewStream(StreamBase):
-    pass
+
+class NewStream(BaseModel):
+    name: str
+    allow_live: bool
 
 
 class ShowLiveStream(BaseModel):
@@ -25,5 +29,3 @@ class ShowStream(StreamBase):
 
     class Config:
         orm_mode = True
-
-    pass

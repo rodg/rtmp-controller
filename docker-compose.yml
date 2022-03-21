@@ -1,0 +1,11 @@
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: api
+    volumes:
+      - ./app:/code/app
+      - ./db:/code/db
+    ports:
+      - "80:80"

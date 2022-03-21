@@ -22,15 +22,18 @@ class Stream(Base):
     allow_live = Column(Boolean)
 
     live_stream: "LiveStream" = relationship(
-        "LiveStream", back_populates="stream", cascade="delete"
+        "LiveStream", back_populates="stream", cascade="delete", uselist=False
     )
 
 
 class LiveStream(Base):
     __tablename__ = "live_streams"
+    __table_args__ = (UniqueConstraint("stream_id"),)
     id = Column(Integer, primary_key=True, index=True)
     stream_id = Column(Integer, ForeignKey("streams.id"))
     client_id = Column(Integer)
     region = Column(String)
 
-    stream: "Stream" = relationship("Stream", back_populates="live_stream")
+    stream: "Stream" = relationship(
+        "Stream", back_populates="live_stream", uselist=False
+    )
