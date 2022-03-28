@@ -20,14 +20,11 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8080",
+    "http://localhost:9090",
 ]
 
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware, allow_methods=["*"], allow_headers=["*"], allow_origins=["*"]
 )
 
 
@@ -35,41 +32,67 @@ def generate_stream_key():
     return "".join(random.choice(string.ascii_letters) for _ in range(25))
 
 
-@app.get("/")
+@app.get("/done")
 def read_root():
     return {"Hello": "World"}
 
 
-@app.get("/drop/{name}", response_model=models.ShowStream)
+@app.put("/drop/{name}", response_model=models.ShowStream)
 async def drop_stream(
     name: str, change_key: Optional[bool] = None, db: Session = Depends(get_db)
 ):
     stmt = select(schemas.Stream).where(schemas.Stream.name == name)
     try:
-        stream = db.execute(stmt).scalar_one()
+        stream: schemas.Stream = db.execute(stmt).scalar_one()
     except Exception as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND)
+
+    if not stream.live_stream:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No livestream to drop!",
+        )
+
     params = {"app": "live", "name": name}
-    response = requests.get(
-        f"https://{stream.live_stream.region}.{domain}/control/drop/publisher",
-        params=params,
-    )
+    try:
+        response = requests.get(
+            f"https://{stream.live_stream.region}.{domain}/control/drop/publisher",
+            params=params,
+        )
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send control request to RTMP server!",
+        )
+    if response.status_code >= 400:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Bad response from RTMP server when attempting to drop stream!",
+        )
+    else:
+        try:
+            db.delete(stream.live_stream)
+            db.commit()
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to delete livestream from DB!",
+            )
+
     print(response.status_code)
+    print(change_key)
     if change_key:
         stream.stream_key = generate_stream_key()
         try:
+            db.flush()
             db.commit()
+            print("Stream key changed")
             return stream
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Stream key changing failed!!",
             )
-    if response.status_code >= 400:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to communicate with RTMP!",
-        )
     return stream
 
 
@@ -79,7 +102,6 @@ async def get_streams(
 ):
     stmt = select(schemas.Stream)
     result = db.execute(stmt).scalars().all()
-    print(result[0])
     return result
 
 
