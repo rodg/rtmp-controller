@@ -1,3 +1,4 @@
+from typing import List
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.db import Base
@@ -12,6 +13,17 @@ class User(Base):
     password = Column(String)
 
 
+class Marathon(Base):
+    __tablename__ = "marathon"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    name = Column(String, unique=True)
+    password = Column(String)
+
+    streams: List["Stream"] = relationship("Stream")
+
+
 class Stream(Base):
     __tablename__ = "streams"
     __table_args__ = (UniqueConstraint("name"),)
@@ -20,7 +32,9 @@ class Stream(Base):
     name = Column(String)
     stream_key = Column(String)
     allow_live = Column(Boolean)
+    marathon_name = Column(String, ForeignKey("marathon.name"))
 
+    marathon: Marathon = relationship("Marathon", back_populates="streams")
     live_stream: "LiveStream" = relationship(
         "LiveStream", back_populates="stream", cascade="delete", uselist=False
     )

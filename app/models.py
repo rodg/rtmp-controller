@@ -6,6 +6,7 @@ class StreamBase(BaseModel):
     name: str
     stream_key: str
     allow_live: bool
+    marathon_name: str
 
     class Config:
         orm_mode = True
@@ -29,3 +30,18 @@ class ShowStream(StreamBase):
 
     class Config:
         orm_mode = True
+
+
+class MarathonBase(BaseModel):
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class ShowMarathon(MarathonBase):
+    pass
+
+
+class NewMarathon(MarathonBase):
+    pass
