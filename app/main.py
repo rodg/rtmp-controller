@@ -1,16 +1,21 @@
-import requests
-from typing import Optional, List
-from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
-from fastapi.responses import RedirectResponse
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy import select, delete
-import random, string
+import os
+import random
+import string
+from typing import List, Optional
 
-from . import schemas, models
+import requests
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from sqlalchemy import delete, select
+from sqlalchemy.orm import Session
+
+from . import models, schemas
 from .db import engine, get_db
 
-domain = "popola.dev"
+load_dotenv()
+domain = os.environ.get("DOMAIN")
 
 schemas.Base.metadata.create_all(engine)
 

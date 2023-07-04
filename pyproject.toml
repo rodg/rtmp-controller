@@ -13,6 +13,7 @@ requests = "^2.27.1"
 types-requests = "^2.27.11"
 sqlalchemy2-stubs = "^0.0.2-alpha.20"
 SQLAlchemy = {extras = ["mypy"], version = "^1.4.32"}
+python-dotenv = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.940"
