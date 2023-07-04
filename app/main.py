@@ -15,7 +15,7 @@ from . import models, schemas
 from .db import engine, get_db
 
 load_dotenv()
-domain = os.environ.get("DOMAIN")
+domain = os.environ.get("RTMP_DOMAIN")
 
 schemas.Base.metadata.create_all(engine)
 
